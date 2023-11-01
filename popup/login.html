@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="popup.css" />
+    <title>Chrome Addon v3: popup</title>
+  </head>
+  <body style="width: 750px; height: 500px">
+    <form id="_loginForm" method="post" class="formCardLogin">
+      <div class="ckt-card loginCard alignLoginCard" style="background: #fff">
+        <img src="../logo/logo-128.png" />
+        <h1>Connexion</h1>
+        <div class="inputLogIn">
+          <label for="inputUsername">Nom d'utilisateur :</label>
+          <input
+            class="ckt-textinput"
+            type="text"
+            value=""
+            name="username"
+            id="inputUsername"
+            autocomplete="username"
+            required=""
+            autofocus=""
+          />
+        </div>
+        <div class="inputLogIn">
+          <label for="inputPassword">Mot de passe :</label>
+          <input
+            class="ckt-textinput"
+            type="password"
+            name="password"
+            id="inputPassword"
+            autocomplete="current-password"
+            required=""
+          />
+        </div>
+        <input
+          id="_csrf_token"
+          type="hidden"
+          name="_csrf_token"
+          value="2af802a.ZnM9i5vD4jH-mFCi7WMVPa4tAm8KGmcA-CDoXGsEklA.AwJrzPOvvQGEwgLzshJsVP5IWBtvT1Uyu1iGNhIz1jMxQFOm8ayBZ470FQ"
+        />
+
+        <button class="ckt-button primary" type="submit">Connexion</button>
+      </div>
+    </form>
+  </body>
+  <script src="../const.js"></script>
+  <script src="login.js"></script>
+</html>

@@ -11,10 +11,10 @@
   "options_page": "settings/settings.html",
   "action": {
     "default_title": "Main View",
-    "default_popup": "popup/popup.html"
+    "default_popup": "popup/login.html"
   },
-  "permissions": [],
-  "host_permissions": ["*://*/*"],
+  "permissions": ["activeTab", "contextMenus", "storage"],
+  "host_permissions": ["https://dashboard.c-koya.tech/*"],
   "background": {
     "service_worker": "service-worker.js"
   },
