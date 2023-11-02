@@ -1,7 +1,7 @@
 window.addEventListener("load", () => main());
 
 function main() {
-  if (!!res.url.match(/(?:\/TimeClock\/view)/)) {
+  if (window.location.href.match(/(?:\/recapWeek)/)) {
     let mutationObserver = new MutationObserver((mutations) => {
       const title = document.getElementsByTagName("title")[0].innerHTML;
       const pNode = mutations.find(
@@ -16,7 +16,7 @@ function main() {
         1000;
 
       const hour = title.match(/([0-1]?[0-9]|2[0-3]):([0-5][0-9])/);
-
+      console.log("hour", hour)
       if (hour) {
         const date = new Date();
         date.setHours(parseInt(hour[1]));
