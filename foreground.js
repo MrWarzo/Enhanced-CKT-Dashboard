@@ -9,14 +9,14 @@ function main() {
       ).addedNodes[0];
       const total = pNode.innerHTML;
 
-      const totalDuration = total.match(/([0-1]?[0-9]|2[0-3])h ([0-5][0-9])/);
+      const totalDuration = total.match(/([0-9][0-9])h ([0-5][0-9])/);
       const totalTimestamp =
         (parseInt(totalDuration[1]) * 60 + parseInt(totalDuration[2])) *
         60 *
         1000;
 
       const hour = title.match(/([0-1]?[0-9]|2[0-3]):([0-5][0-9])/);
-      console.log("hour", hour)
+
       if (hour) {
         const date = new Date();
         date.setHours(parseInt(hour[1]));
