@@ -31,12 +31,17 @@ function main() {
           Math.floor((newTotalTimestamp / 1000 / 60) % 60),
         ];
 
+        let minuts = newHour[1];
+        if (minuts < 10) {
+          minuts = "0" + minuts;
+        }
+
         const trueTotalPNode = document.createElement("p");
         trueTotalPNode.innerHTML =
           `<span style="font-weight:600">Vrai total : </span>` +
           newHour[0] +
           "h " +
-          newHour[1];
+          minuts;
         pNode.appendChild(trueTotalPNode);
       }
     });
