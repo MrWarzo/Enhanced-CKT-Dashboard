@@ -26,27 +26,79 @@ function main() {
         const calculated = now.getTime() - date.getTime();
 
         const newTotalTimestamp = calculated + totalTimestamp;
-        const newHour = [
-          Math.floor(newTotalTimestamp / 1000 / 60 / 60),
-          Math.floor((newTotalTimestamp / 1000 / 60) % 60),
-        ];
-
-        let minuts = newHour[1];
-        if (minuts < 10) {
-          minuts = "0" + minuts;
-        }
-
+        const actualTime = formattedTime(newTotalTimestamp);
+      
         const trueTotalPNode = document.createElement("p");
-        trueTotalPNode.innerHTML =
-          `<span style="font-weight:600">Vrai total : </span>` +
-          newHour[0] +
-          "h " +
-          minuts;
+        trueTotalPNode.innerHTML = `<span style="font-weight:600">Vrai total : </span>` + actualTime;
         pNode.appendChild(trueTotalPNode);
+
+        const copyButton35 = document.createElement("button");
+        copyButton35.innerHTML = '35h <i class="fas fa-copy"></i>';
+        copyButton35.addEventListener("click", () => handleCopyClick(35, newTotalTimestamp, actualTime));
+
+        const copyButton39 = document.createElement("button");
+        copyButton39.innerHTML = '39h <i class="fas fa-copy"></i>';
+        copyButton39.addEventListener("click", () => handleCopyClick(39, newTotalTimestamp, actualTime));
+
+        pNode.appendChild(copyButton35);
+        pNode.appendChild(copyButton39);
       }
     });
+
     mutationObserver.observe(document.getElementById("WeekPointageRoot"), {
       childList: true,
     });
   }
+}
+
+function handleCopyClick(maxHour, newTotalTimestamp, actualTime) {
+  const timeToBeDone = maxHour * 60 * 60 * 1000 - newTotalTimestamp;
+  const timeToBeDoneValue = formattedTime(timeToBeDone);
+  const smiley = computedSmiley(newTotalTimestamp);
+
+  const textToCopy = `Temps de travail effectué : ${actualTime} \nReste à faire : (${timeToBeDoneValue}) ${smiley}`;
+  navigator.clipboard.writeText(textToCopy);
+}
+
+function formattedTime(time)
+{
+  const formattedTime = [
+    Math.floor(time / 1000 / 60 / 60),
+    Math.floor((time / 1000 / 60) % 60),
+  ];
+
+  let minuts = formattedTime[1];
+  if (minuts < 10) minuts = `0${minuts}`;
+
+  return `${formattedTime[0]} h ${minuts}`;
+}
+
+function computedSmiley(time)
+{
+  const formattedHourDone =  Math.floor(time / 1000 / 60 / 60);
+  let smiley = '';
+
+  switch (true) {
+    case formattedHourDone < 10:
+      smiley = '😢';
+      break;
+
+    case formattedHourDone > 10 && formattedHourDone <= 20:
+      smiley = '😔';
+      break;
+    
+    case formattedHourDone > 5 && formattedHourDone <= 10:
+      smiley = '😐';
+      break;
+
+    case formattedHourDone > 5 && formattedHourDone <= 0:
+      smiley = '😃';
+      break;
+
+    default:
+      smiley = '😄';
+      break;
+  }
+
+  return smiley;
 }
