@@ -54,7 +54,7 @@ function main() {
 function handleCopyClick(maxHour, newTotalTimestamp, actualTime) {
   const timeToBeDone = maxHour * 60 * 60 * 1000 - newTotalTimestamp;
   const timeToBeDoneValue = formattedTime(timeToBeDone);
-  const smiley = computedSmiley(newTotalTimestamp);
+  const smiley = computedSmiley(newTotalTimestamp, maxHour);
 
   const textToCopy = `Temps de travail effectué : ${actualTime} \nReste à faire : (${timeToBeDoneValue}) ${smiley}`;
   navigator.clipboard.writeText(textToCopy);
@@ -73,26 +73,26 @@ function formattedTime(time)
   return `${formattedTime[0]} h ${minuts}`;
 }
 
-function computedSmiley(time)
+function computedSmiley(time, maxHour)
 {
   const formattedHourDone =  Math.floor(time / 1000 / 60 / 60);
   let smiley = '';
 
   switch (true) {
-    case formattedHourDone < 10:
+    case formattedHourDone < 5:
+      smiley = '😱';
+      break;
+
+    case formattedHourDone > 5 && formattedHourDone <= 20:
+      smiley = '😭';
+      break;
+    
+    case formattedHourDone > 20 && formattedHourDone <= 30:
       smiley = '😢';
       break;
 
-    case formattedHourDone > 10 && formattedHourDone <= 20:
-      smiley = '😔';
-      break;
-    
-    case formattedHourDone > 5 && formattedHourDone <= 10:
-      smiley = '😐';
-      break;
-
-    case formattedHourDone > 5 && formattedHourDone <= 0:
-      smiley = '😃';
+    case formattedHourDone > 30 && formattedHourDone <= maxHour:
+      smiley = '😮';
       break;
 
     default:
