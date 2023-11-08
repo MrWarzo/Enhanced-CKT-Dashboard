@@ -21,7 +21,7 @@ function main() {
         trueTotalPNode.innerHTML = `<span style="font-weight:700">Vrai total : </span>` + newTotalTime;
         pNode.appendChild(trueTotalPNode);
         
-        computedInputAndButton(35, pNode, 0, 0, "HoursToDO", "Temps de travail à faire par semaine : ");
+        computedInputAndButton(35, pNode, newTotalTimestamp, newTotalTime, "HoursToDO", "Temps de travail à faire par semaine : ");
       }
     });
 
