@@ -3,10 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="popup.css" />
+    <link id="dashboard-apptype-css" rel="stylesheet" />
     <title>Chrome Addon v3: popup</title>
   </head>
   <body style="width: 750px; height: 500px">
     <div>Connecté en tant que <span id="username"></span></div>
+
+    <div id="pointages-header" class="pointages-header"></div>
+    <div id="pointages-list" class="pointages-list"></div>
   </body>
   <script src="../const.js"></script>
   <script src="connected.js"></script>
