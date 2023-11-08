@@ -21,10 +21,8 @@ function main() {
         trueTotalPNode.innerHTML = `<span style="font-weight:700">Vrai total : </span>` + newTotalTime;
         pNode.appendChild(trueTotalPNode);
         
-        const btn35h = computedButton(35, pNode, newTotalTimestamp, newTotalTime);
-        const btn39h = computedButton(39, pNode, newTotalTimestamp, newTotalTime);
+        computedInputAndButton(35, pNode, 0, 0, "HoursToDO", "Temps de travail à faire par semaine : ");
       }
-      computedInput(35, pNode, 0, 0);
     });
 
     mutationObserver.observe(document.getElementById("WeekPointageRoot"), {
@@ -46,14 +44,14 @@ function computedNewTotalTimeStamp(totalTimestamp, titleCheckInTime) {
   return calculated + totalTimestamp;
 }
 
-function computedInput(HoursToDO, pNode, newTotalTimestamp, newTotalTime) {
+function computedInputAndButton(HoursToDO, pNode, newTotalTimestamp, newTotalTime, storage, label) {
   const div = document.createElement("div");
   div.style.display = 'flex';
   div.style.alignItems = 'center';
   div.style.marginTop = '1rem';
 
   const p = document.createElement("p");
-  p.innerHTML = 'Temps de travail à faire par semaine : ';
+  p.innerHTML = label;
 
   const input = document.createElement("input");
   input.value = HoursToDO;
@@ -66,12 +64,12 @@ function computedInput(HoursToDO, pNode, newTotalTimestamp, newTotalTime) {
   input.style.textAlign = "center";
   input.style.color = "#3e9d51";
   input.style.appearance = "textfield";
-  chrome.storage.sync.get("HoursToDO", function (data) {
-    if (data.HoursToDO) input.value = data.HoursToDO;
+  chrome.storage.sync.get(storage, function (data) {
+    if (data[storage]) input.value = data[storage];
   });
   input.addEventListener("change", (e) => {
     const newHoursToDO = e.target.value;
-    chrome.storage.sync.set({ HoursToDO: newHoursToDO }, function () {});
+    chrome.storage.sync.set({ [storage]: newHoursToDO }, function () {});
   });
 
   const button = document.createElement("button");
@@ -86,18 +84,6 @@ function computedInput(HoursToDO, pNode, newTotalTimestamp, newTotalTime) {
   div.appendChild(button);
 
   pNode.appendChild(div);
-}
-
-// Créé un bouton pour copier la valeur du temps de travail déjà effectué et le temps restant à faire
-function computedButton(HoursToDO, pNode, newTotalTimestamp, newTotalTime) {
-  const button = document.createElement("button");
-  button.innerHTML = HoursToDO + 'h <i class="fas fa-copy" style="margin-left: 0.5rem"></i>';
-  button.classList.add('ckt-button');
-  button.classList.add('primary');
-  button.style.marginLeft = '0';
-  button.addEventListener("click", () => handleCopyClick(HoursToDO, newTotalTimestamp, newTotalTime));
-
-  pNode.appendChild(button);
 }
 
 // Gère l'évènement au clic sur les boutons de copie
