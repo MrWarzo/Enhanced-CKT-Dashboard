@@ -85,27 +85,37 @@ function formattedTime(time)
 function computedSmiley(time, HoursToDO)
 {
   const formattedHourDone = Math.floor(time / 1000 / 60 / 60);
+  const percentHourDone = formattedHourDone * 100 / HoursToDO; 
+
   let smiley = '';
 
   switch (true) {
-    case formattedHourDone < 5:
+    case percentHourDone < 10:
+      smiley = '😴';
+      break;
+
+    case percentHourDone > 10 && percentHourDone <= 25:
       smiley = '😱';
       break;
 
-    case formattedHourDone > 5 && formattedHourDone <= 20:
+    case percentHourDone > 25 && percentHourDone <= 50:
       smiley = '😭';
       break;
     
-    case formattedHourDone > 20 && formattedHourDone <= 30:
+    case formattedHourDone > 50 && formattedHourDone <= 75:
       smiley = '😢';
       break;
 
-    case formattedHourDone > 30 && formattedHourDone <= HoursToDO:
+    case formattedHourDone > 75 && formattedHourDone <= 90:
       smiley = '😮';
       break;
 
-    default:
+    case formattedHourDone > 90 && formattedHourDone <= 100:
       smiley = '😄';
+      break;
+
+    default:
+      smiley = '🤩';
       break;
   }
 
