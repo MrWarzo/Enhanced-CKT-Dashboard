@@ -160,6 +160,10 @@ function computedSmiley(time, HoursToDO)
     case percentageDone > 100 :
       key = 6;
       break;
+
+    default:
+      smiley = '🤩';
+      break;
   }
 
   const selectedSmileys = smileys[key];
