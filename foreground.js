@@ -102,15 +102,15 @@ function computedSmiley(time, HoursToDO)
       smiley = '😭';
       break;
     
-    case formattedHourDone > 50 && formattedHourDone <= 75:
+    case percentHourDone > 50 && percentHourDone <= 75:
       smiley = '😢';
       break;
 
-    case formattedHourDone > 75 && formattedHourDone <= 90:
+    case percentHourDone > 75 && percentHourDone <= 90:
       smiley = '😮';
       break;
 
-    case formattedHourDone > 90 && formattedHourDone <= 100:
+    case percentHourDone > 90 && percentHourDone <= 100:
       smiley = '😄';
       break;
 
