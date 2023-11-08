@@ -7,23 +7,24 @@ function main() {
       const pNode = mutations.find(
         (x) => x.addedNodes[0] && x.addedNodes[0].nodeName === "P"
       ).addedNodes[0];
-
+      
       const total = pNode.innerHTML;
       const totalDuration = total.match(/([0-9][0-9])h ([0-5][0-9])/);
       const totalTimestamp = (parseInt(totalDuration[1]) * 60 + parseInt(totalDuration[2])) * 60 * 1000;
       const titleCheckInTime = title.match(/([0-1]?[0-9]|2[0-3]):([0-5][0-9])/);
-
+      
       if (titleCheckInTime) {
         const newTotalTimestamp = computedNewTotalTimeStamp(totalTimestamp, titleCheckInTime);
         const newTotalTime = formattedTime(newTotalTimestamp);
         const trueTotalPNode = document.createElement("p");
-
+        
         trueTotalPNode.innerHTML = `<span style="font-weight:700">Vrai total : </span>` + newTotalTime;
         pNode.appendChild(trueTotalPNode);
-
+        
         const btn35h = computedButton(35, pNode, newTotalTimestamp, newTotalTime);
         const btn39h = computedButton(39, pNode, newTotalTimestamp, newTotalTime);
       }
+      computedInput(35, pNode, 0, 0);
     });
 
     mutationObserver.observe(document.getElementById("WeekPointageRoot"), {
@@ -43,6 +44,48 @@ function computedNewTotalTimeStamp(totalTimestamp, titleCheckInTime) {
   const calculated = now.getTime() - checkInTime.getTime();
 
   return calculated + totalTimestamp;
+}
+
+function computedInput(HoursToDO, pNode, newTotalTimestamp, newTotalTime) {
+  const div = document.createElement("div");
+  div.style.display = 'flex';
+  div.style.alignItems = 'center';
+  div.style.marginTop = '1rem';
+
+  const p = document.createElement("p");
+  p.innerHTML = 'Temps de travail à faire par semaine : ';
+
+  const input = document.createElement("input");
+  input.value = HoursToDO;
+  input.type = "number";
+  input.style.width = '3rem';
+  input.style.marginLeft = '0.5rem';
+  input.style.padding = "0.5em";
+  input.style.border = "2px solid #3e9d51";
+  input.style.borderRadius = "10px";
+  input.style.textAlign = "center";
+  input.style.color = "#3e9d51";
+  input.style.appearance = "textfield";
+  chrome.storage.sync.get("HoursToDO", function (data) {
+    if (data.HoursToDO) input.value = data.HoursToDO;
+  });
+  input.addEventListener("change", (e) => {
+    const newHoursToDO = e.target.value;
+    chrome.storage.sync.set({ HoursToDO: newHoursToDO }, function () {});
+  });
+
+  const button = document.createElement("button");
+  button.innerHTML = '<i class="fas fa-copy"></i>';
+  button.classList.add('ckt-button');
+  button.classList.add('primary');
+  button.style.marginLeft = '0.5rem';
+  button.addEventListener("click", () => handleCopyClick(input.value, newTotalTimestamp, newTotalTime));
+
+  div.appendChild(p);
+  div.appendChild(input);
+  div.appendChild(button);
+
+  pNode.appendChild(div);
 }
 
 // Créé un bouton pour copier la valeur du temps de travail déjà effectué et le temps restant à faire
