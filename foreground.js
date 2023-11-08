@@ -7,41 +7,22 @@ function main() {
       const pNode = mutations.find(
         (x) => x.addedNodes[0] && x.addedNodes[0].nodeName === "P"
       ).addedNodes[0];
+
       const total = pNode.innerHTML;
-
       const totalDuration = total.match(/([0-9][0-9])h ([0-5][0-9])/);
-      const totalTimestamp =
-        (parseInt(totalDuration[1]) * 60 + parseInt(totalDuration[2])) *
-        60 *
-        1000;
+      const totalTimestamp = (parseInt(totalDuration[1]) * 60 + parseInt(totalDuration[2])) * 60 * 1000;
+      const titleCheckInTime = title.match(/([0-1]?[0-9]|2[0-3]):([0-5][0-9])/);
 
-      const hour = title.match(/([0-1]?[0-9]|2[0-3]):([0-5][0-9])/);
-
-      if (hour) {
-        const date = new Date();
-        date.setHours(parseInt(hour[1]));
-        date.setMinutes(parseInt(hour[2]));
-        const now = new Date();
-
-        const calculated = now.getTime() - date.getTime();
-
-        const newTotalTimestamp = calculated + totalTimestamp;
-        const actualTime = formattedTime(newTotalTimestamp);
-      
+      if (titleCheckInTime) {
+        const newTotalTimestamp = computedNewTotalTimeStamp(totalTimestamp, titleCheckInTime);
+        const newTotalTime = formattedTime(newTotalTimestamp);
         const trueTotalPNode = document.createElement("p");
-        trueTotalPNode.innerHTML = `<span style="font-weight:600">Vrai total : </span>` + actualTime;
+
+        trueTotalPNode.innerHTML = `<span style="font-weight:700">Vrai total : </span>` + newTotalTime;
         pNode.appendChild(trueTotalPNode);
 
-        const copyButton35 = document.createElement("button");
-        copyButton35.innerHTML = '35h <i class="fas fa-copy"></i>';
-        copyButton35.addEventListener("click", () => handleCopyClick(35, newTotalTimestamp, actualTime));
-
-        const copyButton39 = document.createElement("button");
-        copyButton39.innerHTML = '39h <i class="fas fa-copy"></i>';
-        copyButton39.addEventListener("click", () => handleCopyClick(39, newTotalTimestamp, actualTime));
-
-        pNode.appendChild(copyButton35);
-        pNode.appendChild(copyButton39);
+        const btn35h = computedButton(35, pNode, newTotalTimestamp, newTotalTime);
+        const btn39h = computedButton(39, pNode, newTotalTimestamp, newTotalTime);
       }
     });
 
@@ -51,15 +32,42 @@ function main() {
   }
 }
 
-function handleCopyClick(maxHour, newTotalTimestamp, actualTime) {
-  const timeToBeDone = maxHour * 60 * 60 * 1000 - newTotalTimestamp;
-  const timeToBeDoneValue = formattedTime(timeToBeDone);
-  const smiley = computedSmiley(newTotalTimestamp, maxHour);
+// calcule le temps de travail effectué
+function computedNewTotalTimeStamp(totalTimestamp, titleCheckInTime) {
+  const now = new Date();
+  const checkInTime = new Date();
+  checkInTime.setHours(parseInt(titleCheckInTime[1]));
+  checkInTime.setMinutes(parseInt(titleCheckInTime[2]));
 
-  const textToCopy = `Temps de travail effectué : ${actualTime} \nReste à faire : (${timeToBeDoneValue}) ${smiley}`;
+  // temps entre l'heure actuelle et l'heure de début de pointage
+  const calculated = now.getTime() - checkInTime.getTime();
+
+  return calculated + totalTimestamp;
+}
+
+// Créé un bouton pour copier la valeur du temps de travail déjà effectué et le temps restant à faire
+function computedButton(HoursToDO, pNode, newTotalTimestamp, newTotalTime) {
+  const button = document.createElement("button");
+  button.innerHTML = HoursToDO + 'h <i class="fas fa-copy" style="margin-left: 0.5rem"></i>';
+  button.classList.add('ckt-button');
+  button.classList.add('primary');
+  button.style.marginLeft = '0';
+  button.addEventListener("click", () => handleCopyClick(HoursToDO, newTotalTimestamp, newTotalTime));
+
+  pNode.appendChild(button);
+}
+
+// Gère l'évènement au clic sur les boutons de copie
+function handleCopyClick(HoursToDO, newTotalTimestamp, newTotalTime) {
+  const timeToBeDone = HoursToDO * 60 * 60 * 1000 - newTotalTimestamp;
+  const timeToBeDoneValue = formattedTime(timeToBeDone);
+  const smiley = computedSmiley(newTotalTimestamp, HoursToDO);
+
+  const textToCopy = `Temps de travail effectué : ${newTotalTime} \nReste à faire : ${timeToBeDoneValue} ${smiley}`;
   navigator.clipboard.writeText(textToCopy);
 }
 
+// Formate le temps en heures et minutes
 function formattedTime(time)
 {
   const formattedTime = [
@@ -70,12 +78,13 @@ function formattedTime(time)
   let minuts = formattedTime[1];
   if (minuts < 10) minuts = `0${minuts}`;
 
-  return `${formattedTime[0]} h ${minuts}`;
+  return `${formattedTime[0]}h${minuts}`;
 }
 
-function computedSmiley(time, maxHour)
+// Détermine le smiley à afficher en fonction du temps de travail effectué
+function computedSmiley(time, HoursToDO)
 {
-  const formattedHourDone =  Math.floor(time / 1000 / 60 / 60);
+  const formattedHourDone = Math.floor(time / 1000 / 60 / 60);
   let smiley = '';
 
   switch (true) {
@@ -91,7 +100,7 @@ function computedSmiley(time, maxHour)
       smiley = '😢';
       break;
 
-    case formattedHourDone > 30 && formattedHourDone <= maxHour:
+    case formattedHourDone > 30 && formattedHourDone <= HoursToDO:
       smiley = '😮';
       break;
 
