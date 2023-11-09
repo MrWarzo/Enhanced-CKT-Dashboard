@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Enhanced CKT Dashboard",
+  "description": "L'extension du futur",
+  "version": "1.0.1",
+  //   "icons": {
+  //     "16": "/public/logo/logo-16.png",
+  //     "48": "/public/logo/logo-48.png",
+  //     "128": "/public/logo/logo-128.png"
+  //   },
+  //   "options_page": "settings/settings.html",
+  "action": {
+    "default_title": "Enhanced CKT Dashboard",
+    "default_popup": "js/index.html"
+  },
+  "permissions": ["storage"],
+  "host_permissions": ["https://dashboard.c-koya.tech/*"]
+  //   "background": {
+  //     "service_worker": "service-worker.js"
+  //   },
+  //   "content_scripts": [
+  //     {
+  //       "js": ["foreground.js"],
+  //       "matches": ["https://dashboard.c-koya.tech/*"]
+  //     }
+  //   ]
+}
