@@ -43,13 +43,19 @@ function getTimeClockView() {
       tempReloadA.addEventListener("click", () => { window.location.reload() });
       pointageHeader.appendChild(tempReloadA);
 
-      if (html.getElementsByTagName("title")[0].innerHTML.match(/(?:depuis)/)) {
+      const currentPointage = html.getElementsByTagName("title")[0];
+      if (currentPointage.innerText.match(/(?:depuis)/)) {
+        const span = document.createElement("span");
+        span.setAttribute("class", "pointage-text");
+        span.innerText = currentPointage.innerText.replace(/(\r\n|\n|\r)/gm, "");
+        pointageHeader.appendChild(span);
+
         // OUI c'est dégueulasse
         Array.prototype.slice.call(html.getElementsByClassName("stopPointage")).forEach((pointage) => {
-          const stopPointage = { href: pointage.getAttribute("href"), label: pointage.innerText, classname: "stop-pointage" };
+          const stopPointage = { href: pointage.getAttribute("href"), label: pointage.innerText };
           const a = document.createElement("a");
           a.setAttribute("href", DASHBOARD_URL + stopPointage.href);
-          a.setAttribute("class", `pointage ${stopPointage.classname}`);
+          a.setAttribute("class", `pointage stop-pointage`);
           a.innerText = stopPointage.label;
 
           pointageHeader.appendChild(a);

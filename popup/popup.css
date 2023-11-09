@@ -14,6 +14,11 @@ body {
   color: red;
 }
 
+.pointage-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
 .pointages-header {
   width: 100%;
   display: flex;
