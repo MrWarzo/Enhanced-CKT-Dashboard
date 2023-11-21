@@ -110,33 +110,59 @@ function formattedTime(time)
   return `${formattedTime[0]}h${minuts}`;
 }
 
-// Détermine le smiley à afficher en fonction du temps de travail effectué
+/**
+ * Détermine le smiley à afficher en fonction du temps de travail effectué convertit en pourcentage
+ * 
+ * @see https://www.w3schools.com/charsets/ref_emoji_smileys.asp
+ */
 function computedSmiley(time, HoursToDO)
 {
   const formattedHourDone = Math.floor(time / 1000 / 60 / 60);
-  let smiley = '';
+  const percentageDone = formattedHourDone * 100 / HoursToDO;
+
+  const smileys = {
+    0: ['☕','😨','😫','😭','😱','😰','😩','😡','🥶','🥵'],
+    1: ['☕','🤕','😪','🥱','😠','😞','😣','😤','🥺','😖'],
+    2: ['☕','😟','😬','😯','🙁','😥','😧','😔'],
+    3: ['😑','😐','😓','😕','😒'],
+    4: ['🙂','🙃','🤗','🤤','😏','😋','😊','😉'],
+    5: ['😀','😃','😄','😅','😆'],
+    6: ['😁','🤩','🤪','🥳','😎','😝','🥂']
+  };
+
+  let key = 0;
 
   switch (true) {
-    case formattedHourDone < 5:
-      smiley = '😱';
+    case percentageDone <= 10:
+      key = 0;
       break;
 
-    case formattedHourDone > 5 && formattedHourDone <= 20:
-      smiley = '😭';
+    case percentageDone > 10 && percentageDone <= 30:
+      key = 1;
       break;
     
-    case formattedHourDone > 20 && formattedHourDone <= 30:
-      smiley = '😢';
+    case percentageDone > 30 && percentageDone <= 50:
+      key = 2;
       break;
 
-    case formattedHourDone > 30 && formattedHourDone <= HoursToDO:
-      smiley = '😮';
+    case percentageDone > 50 && percentageDone <= 70:
+      key = 3;
       break;
 
-    default:
-      smiley = '😄';
+    case percentageDone > 70 && percentageDone <= 90:
+      key = 4;
+      break;
+
+    case percentageDone > 90 && percentageDone <= 100:
+      key = 5;
+      break;
+
+    case percentageDone > 100 :
+      key = 6;
       break;
   }
 
-  return smiley;
+  const selectedSmileys = smileys[key];
+
+  return selectedSmileys[Math.floor(Math.random() * selectedSmileys.length)];
 }
