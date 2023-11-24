@@ -21,7 +21,7 @@ function main() {
         trueTotalPNode.innerHTML = `<span style="font-weight:700">Vrai total : </span>` + newTotalTime;
         pNode.appendChild(trueTotalPNode);
         
-        computedInputAndButton(35, pNode, newTotalTimestamp, newTotalTime, "HoursToDO", "Temps de travail à faire par semaine : ");
+        computedInputAndButton(pNode, newTotalTimestamp, newTotalTime, "HoursToDO", "Temps de travail à faire par semaine : ");
       }
     });
 
@@ -44,7 +44,7 @@ function computedNewTotalTimeStamp(totalTimestamp, titleCheckInTime) {
   return calculated + totalTimestamp;
 }
 
-function computedInputAndButton(HoursToDO, pNode, newTotalTimestamp, newTotalTime, storage, label) {
+function computedInputAndButton(pNode, newTotalTimestamp, newTotalTime, storage, label) {
   const div = document.createElement("div");
   div.style.display = 'flex';
   div.style.alignItems = 'center';
@@ -53,8 +53,20 @@ function computedInputAndButton(HoursToDO, pNode, newTotalTimestamp, newTotalTim
   const p = document.createElement("p");
   p.innerHTML = label;
 
+  const input = computedInputElement(storage);
+  const button = computedButtonElement(input, newTotalTimestamp, newTotalTime);
+
+  div.appendChild(p);
+  div.appendChild(input);
+  div.appendChild(button);
+
+  pNode.appendChild(div);
+}
+
+function computedInputElement(storage) {
   const input = document.createElement("input");
-  input.value = HoursToDO;
+
+  input.value = 35; // valeur par défaut, 35h/semaine
   input.type = "number";
   input.style.width = '3rem';
   input.style.marginLeft = '0.5rem';
@@ -64,26 +76,28 @@ function computedInputAndButton(HoursToDO, pNode, newTotalTimestamp, newTotalTim
   input.style.textAlign = "center";
   input.style.color = "#3e9d51";
   input.style.appearance = "textfield";
+
   chrome.storage.sync.get(storage, function (data) {
     if (data[storage]) input.value = data[storage];
   });
+  
   input.addEventListener("change", (e) => {
-    const newHoursToDO = e.target.value;
-    chrome.storage.sync.set({ [storage]: newHoursToDO }, function () {});
+    chrome.storage.sync.set({ [storage]: e.target.value }, function () {});
   });
 
+  return input;
+}
+
+function computedButtonElement(input, newTotalTimestamp, newTotalTime) {
   const button = document.createElement("button");
+
   button.innerHTML = '<i class="fas fa-copy"></i>';
   button.classList.add('ckt-button');
   button.classList.add('primary');
   button.style.marginLeft = '0.5rem';
   button.addEventListener("click", () => handleCopyClick(input.value, newTotalTimestamp, newTotalTime));
 
-  div.appendChild(p);
-  div.appendChild(input);
-  div.appendChild(button);
-
-  pNode.appendChild(div);
+  return button;
 }
 
 // Gère l'évènement au clic sur les boutons de copie
@@ -159,10 +173,6 @@ function computedSmiley(time, HoursToDO)
 
     case percentageDone > 100 :
       key = 6;
-      break;
-
-    default:
-      smiley = '🤩';
       break;
   }
 
