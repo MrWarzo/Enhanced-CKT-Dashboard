@@ -1,34 +1,35 @@
 window.addEventListener("load", () => main());
 
+// TODO: utiliser les routes api dev à l'occasion
 function main() {
-  if (window.location.href.match(/(?:\/recapWeek)/)) {
-    let mutationObserver = new MutationObserver((mutations) => {
+  setTimeout(() => {
+    if (window.location.href.match(/(?:\/recapWeek)/)) {
       const title = document.getElementsByTagName("title")[0].innerHTML;
-      const pNode = mutations.find(
-        (x) => x.addedNodes[0] && x.addedNodes[0].nodeName === "P"
-      ).addedNodes[0];
-      
+      const root = document.getElementById("WeekPointageRoot");
+      const pNode = root.getElementsByTagName("p")[0];
+
       const total = pNode.innerHTML;
       const totalDuration = total.match(/([0-9][0-9])h ([0-5][0-9])/);
       const totalTimestamp = (parseInt(totalDuration[1]) * 60 + parseInt(totalDuration[2])) * 60 * 1000;
       const titleCheckInTime = title.match(/([0-1]?[0-9]|2[0-3]):([0-5][0-9])/);
-      
-      if (titleCheckInTime) {
-        const newTotalTimestamp = computedNewTotalTimeStamp(totalTimestamp, titleCheckInTime);
-        const newTotalTime = formattedTime(newTotalTimestamp);
-        const trueTotalPNode = document.createElement("p");
-        
-        trueTotalPNode.innerHTML = `<span style="font-weight:700">Vrai total : </span>` + newTotalTime;
-        pNode.appendChild(trueTotalPNode);
-        
-        computedInputAndButton(35, pNode, newTotalTimestamp, newTotalTime, "HoursToDO", "Temps de travail à faire par semaine : ");
-      }
-    });
 
-    mutationObserver.observe(document.getElementById("WeekPointageRoot"), {
-      childList: true,
-    });
-  }
+      let newTotalTimestamp = totalTimestamp;
+
+      if (titleCheckInTime) {
+        setInterval(() => {
+          newTotalTimestamp = computedNewTotalTimeStamp(totalTimestamp, titleCheckInTime);
+        }, 30000);
+      }
+
+      const newTotalTime = formattedTime(newTotalTimestamp);
+      const trueTotalPNode = document.createElement("p");
+
+      trueTotalPNode.innerHTML = `<span style="font-weight:700">Vrai total : </span>` + newTotalTime;
+      pNode.appendChild(trueTotalPNode);
+
+      computedInputAndButton(35, pNode, newTotalTimestamp, newTotalTime, "HoursToDO", "Temps de travail à faire par semaine : ");
+    }
+  }, 1000)
 }
 
 // calcule le temps de travail effectué
@@ -69,7 +70,7 @@ function computedInputAndButton(HoursToDO, pNode, newTotalTimestamp, newTotalTim
   });
   input.addEventListener("change", (e) => {
     const newHoursToDO = e.target.value;
-    chrome.storage.sync.set({ [storage]: newHoursToDO }, function () {});
+    chrome.storage.sync.set({ [storage]: newHoursToDO }, function () { });
   });
 
   const button = document.createElement("button");
@@ -97,8 +98,7 @@ function handleCopyClick(HoursToDO, newTotalTimestamp, newTotalTime) {
 }
 
 // Formate le temps en heures et minutes
-function formattedTime(time)
-{
+function formattedTime(time) {
   const formattedTime = [
     Math.floor(time / 1000 / 60 / 60),
     Math.floor((time / 1000 / 60) % 60),
@@ -115,19 +115,18 @@ function formattedTime(time)
  * 
  * @see https://www.w3schools.com/charsets/ref_emoji_smileys.asp
  */
-function computedSmiley(time, HoursToDO)
-{
+function computedSmiley(time, HoursToDO) {
   const formattedHourDone = Math.floor(time / 1000 / 60 / 60);
   const percentageDone = formattedHourDone * 100 / HoursToDO;
 
   const smileys = {
-    0: ['☕','😨','😫','😭','😱','😰','😩','😡','🥶','🥵'],
-    1: ['☕','🤕','😪','🥱','😠','😞','😣','😤','🥺','😖'],
-    2: ['☕','😟','😬','😯','🙁','😥','😧','😔'],
-    3: ['😑','😐','😓','😕','😒'],
-    4: ['🙂','🙃','🤗','🤤','😏','😋','😊','😉'],
-    5: ['😀','😃','😄','😅','😆'],
-    6: ['😁','🤩','🤪','🥳','😎','😝','🥂']
+    0: ['☕', '😨', '😫', '😭', '😱', '😰', '😩', '😡', '🥶', '🥵'],
+    1: ['☕', '🤕', '😪', '🥱', '😠', '😞', '😣', '😤', '🥺', '😖'],
+    2: ['☕', '😟', '😬', '😯', '🙁', '😥', '😧', '😔'],
+    3: ['😑', '😐', '😓', '😕', '😒'],
+    4: ['🙂', '🙃', '🤗', '🤤', '😏', '😋', '😊', '😉'],
+    5: ['😀', '😃', '😄', '😅', '😆'],
+    6: ['😁', '🤩', '🤪', '🥳', '😎', '😝', '🥂']
   };
 
   let key = 0;
@@ -140,7 +139,7 @@ function computedSmiley(time, HoursToDO)
     case percentageDone > 10 && percentageDone <= 30:
       key = 1;
       break;
-    
+
     case percentageDone > 30 && percentageDone <= 50:
       key = 2;
       break;
@@ -157,7 +156,7 @@ function computedSmiley(time, HoursToDO)
       key = 5;
       break;
 
-    case percentageDone > 100 :
+    case percentageDone > 100:
       key = 6;
       break;
   }
