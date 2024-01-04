@@ -93,7 +93,7 @@ function handleCopyClick(HoursToDO, newTotalTimestamp, newTotalTime) {
   const timeToBeDoneValue = formattedTime(timeToBeDone);
   const smiley = computedSmiley(newTotalTimestamp, HoursToDO);
 
-  const textToCopy = `Temps de travail effectué : ${newTotalTime} \nReste à faire : ${timeToBeDoneValue} ${smiley}`;
+  const textToCopy = `Temps de travail effectué : ${newTotalTime} \nReste à faire : ${timeToBeDoneValue} ${smiley}\nTu termines à ${new Date(new Date().getTime() + timeToBeDone).toLocaleTimeString()}`;
   navigator.clipboard.writeText(textToCopy);
 }
 
