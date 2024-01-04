@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Enhanced CKT Dashboard",
   "description": "Améliore le dashboard CKT parce que bon là...",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "icons": {
     "16": "logo/logo-16.png",
     "48": "logo/logo-48.png",
