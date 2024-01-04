@@ -16,9 +16,7 @@ function main() {
       let newTotalTimestamp = totalTimestamp;
 
       if (titleCheckInTime) {
-        setInterval(() => {
-          newTotalTimestamp = computedNewTotalTimeStamp(totalTimestamp, titleCheckInTime);
-        }, 30000);
+        newTotalTimestamp = computedNewTotalTimeStamp(totalTimestamp, titleCheckInTime);
       }
 
       const newTotalTime = formattedTime(newTotalTimestamp);
