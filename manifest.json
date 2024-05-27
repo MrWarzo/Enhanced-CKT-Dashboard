@@ -1,27 +1,27 @@
 {
-  "manifest_version": 3,
-  "name": "Enhanced CKT Dashboard",
-  "description": "Améliore le dashboard CKT parce que bon là...",
-  "version": "0.3.4",
-  "icons": {
-    "16": "logo/logo-16.png",
-    "48": "logo/logo-48.png",
-    "128": "logo/logo-128.png"
-  },
-  "options_page": "settings/settings.html",
-  "action": {
-    "default_title": "Main View",
-    "default_popup": "popup/login.html"
-  },
-  "permissions": ["storage"],
-  "host_permissions": ["https://dashboard.c-koya.tech/*"],
-  "background": {
-    "service_worker": "service-worker.js"
-  },
-  "content_scripts": [
-    {
-      "js": ["foreground.js"],
-      "matches": ["https://dashboard.c-koya.tech/*"]
-    }
-  ]
+    "manifest_version": 3,
+    "name": "Enhanced CKT Dashboard",
+    "description": "Améliore le dashboard CKT parce que bon là...",
+    "version": "0.3.5",
+    "icons": {
+        "16": "logo/logo-16.png",
+        "48": "logo/logo-48.png",
+        "128": "logo/logo-128.png"
+    },
+    "options_page": "settings/settings.html",
+    "action": {
+        "default_title": "Main View",
+        "default_popup": "popup/login.html"
+    },
+    "permissions": ["storage"],
+    "host_permissions": ["https://super.dashboard.c-koya.tech/*"],
+    "background": {
+        "service_worker": "service-worker.js"
+    },
+    "content_scripts": [
+        {
+            "js": ["foreground.js"],
+            "matches": ["https://super.dashboard.c-koya.tech/*"]
+        }
+    ]
 }
