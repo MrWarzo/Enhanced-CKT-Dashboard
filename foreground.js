@@ -39,10 +39,8 @@ function getTotalDuration(recapWeek) {
 
     // Parcourir les événements et accumuler la durée totale en minutes
     recapWeek.forEach((event) => {
-        if (!event.start || !event.end) return;
-
         const start = new Date(event.start);
-        const end = new Date(event.end);
+        const end = event.end ? new Date(event.end) : new Date();
 
         const duration = (end - start) / (1000 * 60); // Convertir les millisecondes en minutes
         totalMinutes += duration;
