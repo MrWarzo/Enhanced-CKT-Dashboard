@@ -62,6 +62,17 @@ function getTotalDuration(recapWeek) {
     return [formattedDuration, totalMilliseconds];
 }
 
+function getFirstDayOfTheWeek() {
+    const today = new Date();
+    const day = today.getDay();
+    const diff = day === 0 ? -6 : 1 - day;
+
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + diff);
+
+    return monday;
+}
+
 function getRecapWeek() {
     return fetch(ckoyaURL + "/webapi/timeClock/recapWeek", {
         method: "POST",
@@ -69,7 +80,7 @@ function getRecapWeek() {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            date: new Date().toISOString().split("T")[0],
+            date: getFirstDayOfTheWeek().toISOString().split("T")[0],
             userId: 14, // TODO : il faut recup le userID (/me je dirais)
         }),
     }).then((response) => response.json());
