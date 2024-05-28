@@ -81,7 +81,6 @@ function getRecapWeek() {
         },
         body: JSON.stringify({
             date: getFirstDayOfTheWeek().toISOString().split("T")[0],
-            userId: 14, // TODO : il faut recup le userID (/me je dirais)
         }),
     }).then((response) => response.json());
 }
