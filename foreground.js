@@ -1,9 +1,39 @@
-const ckoyaURL = "https://super.dashboard.c-koya.tech";
-
 window.addEventListener("load", () => main());
 
+const DASHBOARD_URL = "https://super.dashboard.c-koya.tech";
+const BUTTON_BASE_STYLE = `
+    padding: 0px 1.125rem;
+    appearance: none;
+    text-align: left;
+    text-decoration: none;
+    box-sizing: border-box;
+    height: 2.25rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    -webkit-tap-highlight-color: transparent;
+    display: inline-block;
+    width: auto;
+    border-radius: 0.25rem;
+    font-weight: 600;
+    position: relative;
+    line-height: 1;
+    font-size: 0.875rem;
+    user-select: none;
+    cursor: pointer;
+    border: 0.0625rem solid transparent;
+    background-color: rgb(76, 193, 98);
+    color: rgb(255, 255, 255);
+    margin: 0 0 0 0.5rem;
+`;
+const BUTTON_HOVER_STYLE = `
+    background-color: rgb(61, 170, 81);
+`;
+const BUTTON_HOVER_ACTIVE = `
+    transform: translateY(0.0625rem);
+`;
+
 function getCsrfTOken() {
-    return fetch(ckoyaURL + "/login", { method: "GET" })
+    return fetch(DASHBOARD_URL + "/login", { method: "GET" })
         .then((response) => response.text())
         .then((responseText) => {
             const parser = new DOMParser();
@@ -23,11 +53,11 @@ function login(csrfToken) {
     body.append("username", "pereira@winylo.com");
     body.append("password", "mdp");
 
-    return fetch(ckoyaURL + "/login", {
+    return fetch(DASHBOARD_URL + "/login", {
         method: "POST",
         headers: {
             ContentType: "application/x-www-form-urlencoded",
-            Origin: ckoyaURL,
+            Origin: DASHBOARD_URL,
         },
         body,
     });
@@ -74,7 +104,7 @@ function getFirstDayOfTheWeek() {
 }
 
 function getRecapWeek() {
-    return fetch(ckoyaURL + "/webapi/timeClock/recapWeek", {
+    return fetch(DASHBOARD_URL + "/webapi/timeClock/recapWeek", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -95,50 +125,37 @@ async function main() {
     const totalDuration = getTotalDuration(recapWeek);
     console.log("totalDuration", totalDuration);
 
-    // setTimeout(() => {
-    if (window.location.href.match(ckoyaURL)) {
-        // if (window.location.href.match(/(?:\/recapWeek)/)) {
-        // const title = document.getElementsByTagName("title")[0].innerHTML;
-        // const pNode = root.getElementsByTagName("p")[0];
-
-        // const total = pNode.innerHTML;
-        // TODO: totalDuration -> faire un get puis recup le _csrfToken puis faire le /login puis recup le sessId puis faire /recapWeek
-        // const newTotalTimestamp = 0;
-        // const totalDuration = total.match(/([0-9][0-9])h ([0-5][0-9])/);
-        // const totalTimestamp = (parseInt(totalDuration[1]) * 60 + parseInt(totalDuration[2])) * 60 * 1000;
-        // const titleCheckInTime = title.match(/([0-1]?[0-9]|2[0-3]):([0-5][0-9])/);
-        // TODO: faire le / puis recup le checkInTime -> permettre de ne plus dépendre du window.location.href
-        // TODO2: En fait on a plus du tout besoin du total je crois à verif
-        // const titleCheckInTime = document.body.innerText.match(
-        //     /Depuis\s*:\s*(([01][0-9]|2[0-3]):[0-5][0-9])/
-        // );
-
-        // let newTotalTimestamp = totalTimestamp;
-
-        // if (titleCheckInTime) {
-        //   newTotalTimestamp = computedNewTotalTimeStamp(totalTimestamp, titleCheckInTime);
-        // }
-
-        // const newTotalTime = formattedTime(newTotalTimestamp);
+    if (window.location.href.match(DASHBOARD_URL)) {
         const trueTotalPNode = document.createElement("p");
         const pNode = document.getElementsByClassName("mantine-Paper-root")[0];
 
+        let HoursToDO = 35;
+        chrome.storage.sync.get("HoursToDO", function (data) {
+            if (data["HoursToDO"]) HoursToDO = data["HoursToDO"];
+        });
+        console.log("hou", HoursToDO);
+        const timeToBeDone = HoursToDO * 60 * 60 * 1000 - totalDuration[1];
+        const pTimeToBeDone = document.createElement("p");
+        pTimeToBeDone.innerHTML =
+            `<span style="font-weight:700">Temps restant : </span>` +
+            formattedTime(timeToBeDone);
+
         trueTotalPNode.innerHTML =
             `<span style="font-weight:700">Total : </span>` + totalDuration[0];
-        // TODO: trouver où injecter le trueTotalPNode (du coup la faudra verif qu'on est sur la bonne page)
-        // TODO2: Il faut aussi qu'on l'affiche direct dans le popup de l'extension pour ne plus dependre de la page
+        // TODO: Il faut aussi qu'on l'affiche direct dans le popup de l'extension pour ne plus dependre de la page
         pNode.appendChild(trueTotalPNode);
+        pNode.appendChild(pTimeToBeDone);
 
+        // TODO : Afficher le temps restant en dessous du choix de temps
         computedInputAndButton(
-            35,
+            HoursToDO,
             pNode,
             totalDuration[1],
             totalDuration[0],
             "HoursToDO",
-            "Temps de travail à faire par semaine : "
+            "Temps à faire : "
         );
     }
-    // }, 1000)
 }
 
 // calcule le temps de travail effectué
@@ -169,57 +186,60 @@ function computedInputAndButton(
 
     const p = document.createElement("p");
     p.innerHTML = label;
+    p.style.fontWeight = "700";
 
     const input = document.createElement("input");
     input.value = HoursToDO;
     input.type = "number";
     input.style.width = "3rem";
     input.style.marginLeft = "0.5rem";
-    input.style.padding = "0.5em";
+    input.style.padding = "0.5rem";
     input.style.border = "2px solid #3e9d51";
-    input.style.borderRadius = "10px";
+    input.style.borderRadius = "0.25rem";
     input.style.textAlign = "center";
     input.style.color = "#3e9d51";
     input.style.appearance = "textfield";
-    chrome.storage.sync.get(storage, function (data) {
-        if (data[storage]) input.value = data[storage];
-    });
     input.addEventListener("change", (e) => {
-        const newHoursToDO = e.target.value;
-        chrome.storage.sync.set({ [storage]: newHoursToDO }, function () {});
+        chrome.storage.sync.set({ [storage]: e.target.value }, function () {});
     });
+
+    const svg = document.createElement("svg");
+    svg.innerHTML = `<svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 512 512"
+            fill="#ffffff"
+        >
+            <path d="M272 0H396.1c12.7 0 24.9 5.1 33.9 14.1l67.9 67.9c9 9 14.1 21.2 14.1 33.9V336c0 26.5-21.5 48-48 48H272c-26.5 0-48-21.5-48-48V48c0-26.5 21.5-48 48-48zM48 128H192v64H64V448H256V416h64v48c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V176c0-26.5 21.5-48 48-48z"></path>
+        </svg>`;
+    svg.width = "100%";
+    svg.height = "100%";
 
     const button = document.createElement("button");
     button.innerHTML = '<i class="fas fa-copy"></i>';
     button.classList.add("ckt-button");
     button.classList.add("primary");
     button.style.marginLeft = "0.5rem";
-    button.style = `
-        padding: 0px 1.125rem;
-        appearance: none;
-        text-align: left;
-        text-decoration: none;
-        box-sizing: border-box;
-        height: 2.25rem;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-        -webkit-tap-highlight-color: transparent;
-        display: inline-block;
-        width: auto;
-        border-radius: 0.25rem;
-        font-weight: 600;
-        position: relative;
-        line-height: 1;
-        font-size: 0.875rem;
-        user-select: none;
-        cursor: pointer;
-        border: 0.0625rem solid transparent;
-        background-color: rgb(76, 193, 98);
-        color: rgb(255, 255, 255);
-        background-color: rgb(61, 170, 81);
-    `;
+    button.style = BUTTON_BASE_STYLE;
+
     button.addEventListener("click", () =>
         handleCopyClick(input.value, newTotalTimestamp, newTotalTime)
     );
+    button.addEventListener("mouseover", () => {
+        button.style = BUTTON_BASE_STYLE + BUTTON_HOVER_STYLE;
+    });
+    button.addEventListener("mouseout", () => {
+        button.style = BUTTON_BASE_STYLE;
+    });
+    button.addEventListener("mousedown", () => {
+        button.style = BUTTON_BASE_STYLE + BUTTON_HOVER_ACTIVE;
+    });
+    button.addEventListener("mouseup", () => {
+        button.style = BUTTON_BASE_STYLE + BUTTON_HOVER_STYLE;
+    });
+
+    button.appendChild(svg);
 
     div.appendChild(p);
     div.appendChild(input);
