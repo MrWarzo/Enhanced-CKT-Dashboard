@@ -115,6 +115,26 @@ function getRecapWeek() {
     }).then((response) => response.json());
 }
 
+async function readSyncStorage(key) {
+    return new Promise((resolve, reject) => {
+        chrome.storage.sync.get([key], function (result) {
+            if (result[key] === undefined) {
+                reject();
+            } else {
+                resolve(result[key]);
+            }
+        });
+    });
+}
+
+async function writeSyncStorage(key, value) {
+    return new Promise((resolve, reject) => {
+        chrome.storage.sync.set({ [key]: value }, function () {
+            resolve();
+        });
+    });
+}
+
 // TODO: utiliser les routes api dev à l'occasion
 async function main() {
     const csrfToken = await getCsrfTOken();
@@ -130,10 +150,14 @@ async function main() {
         const pNode = document.getElementsByClassName("mantine-Paper-root")[0];
 
         let HoursToDO = 35;
-        chrome.storage.sync.get("HoursToDO", function (data) {
-            if (data["HoursToDO"]) HoursToDO = data["HoursToDO"];
-        });
-        console.log("hou", HoursToDO);
+        await readSyncStorage("HoursToDO")
+            .then((data) => {
+                HoursToDO = data;
+            })
+            .catch(async () => {
+                await writeSyncStorage("HoursToDO", HoursToDO);
+            });
+
         const timeToBeDone = HoursToDO * 60 * 60 * 1000 - totalDuration[1];
         const pTimeToBeDone = document.createElement("p");
         pTimeToBeDone.innerHTML =
@@ -199,8 +223,8 @@ function computedInputAndButton(
     input.style.textAlign = "center";
     input.style.color = "#3e9d51";
     input.style.appearance = "textfield";
-    input.addEventListener("change", (e) => {
-        chrome.storage.sync.set({ [storage]: e.target.value }, function () {});
+    input.addEventListener("change", async (e) => {
+        await writeSyncStorage(storage, e.target.value);
     });
 
     const svg = document.createElement("svg");
@@ -268,7 +292,7 @@ function formattedTime(time) {
     let minuts = formattedTime[1];
     if (minuts < 10) minuts = `0${minuts}`;
 
-    return `${formattedTime[0]}h${minuts}`;
+    return `${formattedTime[0]}h ${minuts}`;
 }
 
 /**
