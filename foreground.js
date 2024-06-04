@@ -134,6 +134,7 @@ async function readSyncStorage(key) {
     });
 }
 
+// TODO : Fix Error extension contect invalidated
 async function writeSyncStorage(key, value) {
     return new Promise((resolve, reject) => {
         chrome.storage.sync.set({ [key]: value }, function () {
