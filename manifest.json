@@ -13,13 +13,7 @@
         "default_title": "Main View",
         "default_popup": "popup/login.html"
     },
-    "permissions": [
-        "activeTab",
-        "tabs",
-        "webRequest",
-        "storage",
-        "https://super.dashboard.c-koya.tech/*"
-    ],
+    "permissions": ["activeTab", "tabs", "webRequest", "storage"],
     "host_permissions": ["https://super.dashboard.c-koya.tech/*"],
     "background": {
         "service_worker": "service-worker.js"

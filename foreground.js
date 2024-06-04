@@ -1,6 +1,7 @@
 window.addEventListener("load", () => main());
 
 const DASHBOARD_URL = "https://super.dashboard.c-koya.tech";
+const REFRESH_INTERVAL = 60000;
 const BUTTON_BASE_STYLE = `
     padding: 0px 1.125rem;
     appearance: none;
@@ -103,7 +104,7 @@ function getFirstDayOfTheWeek() {
     return monday;
 }
 
-function getRecapWeek() {
+function getRecapWeek(timer) {
     return fetch(DASHBOARD_URL + "/webapi/timeClock/recapWeek", {
         method: "POST",
         headers: {
@@ -112,7 +113,13 @@ function getRecapWeek() {
         body: JSON.stringify({
             date: getFirstDayOfTheWeek().toISOString().split("T")[0],
         }),
-    }).then((response) => response.json());
+    })
+        .catch(() => {
+            // Si le recapWeek plante (session expirée) on stop tout et on relance le main
+            clearInterval(timer);
+            main();
+        })
+        .then((response) => response.json());
 }
 
 async function readSyncStorage(key) {
@@ -137,49 +144,73 @@ async function writeSyncStorage(key, value) {
 
 // TODO: utiliser les routes api dev à l'occasion
 async function main() {
-    const csrfToken = await getCsrfTOken();
-    console.log("csrf", csrfToken);
-    await login(csrfToken);
-    const recapWeek = await getRecapWeek();
-    console.log("recapWeek", recapWeek);
-    const totalDuration = getTotalDuration(recapWeek);
-    console.log("totalDuration", totalDuration);
+    const csrfToken = await getCsrfTOken(); // Le token CSRF est necessaire pour le login
+    await login(csrfToken); // Le login recup le cookie PHP_SESSIONID
+    await displayInfos();
 
-    if (window.location.href.match(DASHBOARD_URL)) {
-        const trueTotalPNode = document.createElement("p");
-        const pNode = document.getElementsByClassName("mantine-Paper-root")[0];
+    let timer = setInterval(async () => {
+        await displayInfos(timer);
+    }, REFRESH_INTERVAL);
 
-        let HoursToDO = 35;
-        await readSyncStorage("HoursToDO")
-            .then((data) => {
-                HoursToDO = data;
-            })
-            .catch(async () => {
-                await writeSyncStorage("HoursToDO", HoursToDO);
-            });
+    // On relance l'intervale si on revient sur la page
+    window.addEventListener("focus", () => {
+        clearInterval(timer);
+        timer = setInterval(async () => {
+            await displayInfos(timer);
+        }, REFRESH_INTERVAL);
+    });
 
-        const timeToBeDone = HoursToDO * 60 * 60 * 1000 - totalDuration[1];
-        const pTimeToBeDone = document.createElement("p");
-        pTimeToBeDone.innerHTML =
-            `<span style="font-weight:700">Temps restant : </span>` +
-            formattedTime(timeToBeDone);
+    // On stoppe l'intervale si on quitte la page
+    window.addEventListener("blur", () => {
+        clearInterval(timer);
+    });
+}
 
-        trueTotalPNode.innerHTML =
-            `<span style="font-weight:700">Total : </span>` + totalDuration[0];
-        // TODO: Il faut aussi qu'on l'affiche direct dans le popup de l'extension pour ne plus dependre de la page
-        pNode.appendChild(trueTotalPNode);
-        pNode.appendChild(pTimeToBeDone);
+async function displayInfos(timer) {
+    const recapWeek = await getRecapWeek(timer); // Recupere les pointages de la semaine
+    const totalDuration = getTotalDuration(recapWeek); // Calcule la durée totale de travail
 
-        // TODO : Afficher le temps restant en dessous du choix de temps
-        computedInputAndButton(
-            HoursToDO,
-            pNode,
-            totalDuration[1],
-            totalDuration[0],
-            "HoursToDO",
-            "Temps à faire : "
-        );
-    }
+    const trueTotalPNode = document.createElement("p");
+    const pNode = document.getElementsByClassName("mantine-Paper-root")[0];
+
+    // On supprime les anciennes divs pour les remplacer par les nouvelles updatées
+    const oldTrueTotalPNode = document.getElementById("trueTotalPNode");
+    oldTrueTotalPNode?.remove();
+
+    const oldPTimeToBeDone = document.getElementById("pTimeToBeDone");
+    oldPTimeToBeDone?.remove();
+
+    const oldDiv = document.getElementById("divHoursToDO");
+    oldDiv?.remove();
+
+    let HoursToDO = 35;
+    await readSyncStorage("HoursToDO")
+        .then((data) => {
+            HoursToDO = data;
+        })
+        .catch(async () => {
+            await writeSyncStorage("HoursToDO", HoursToDO);
+        });
+
+    const timeToBeDone = HoursToDO * 60 * 60 * 1000 - totalDuration[1];
+    const pTimeToBeDone = document.createElement("p");
+    pTimeToBeDone.innerHTML = `<div id="pTimeToBeDone"><span style="font-weight:700">Temps restant : </span>${formattedTime(
+        timeToBeDone
+    )}</div>`;
+    trueTotalPNode.innerHTML = `<div id="trueTotalPNode"><span id="trueTotalPNode" style="font-weight:700">Total : </span>${totalDuration[0]}</div>`;
+
+    // TODO: Il faut aussi qu'on l'affiche direct dans le popup de l'extension pour ne plus dependre de la page
+    pNode.appendChild(trueTotalPNode);
+    pNode.appendChild(pTimeToBeDone);
+
+    computedInputAndButton(
+        HoursToDO,
+        pNode,
+        totalDuration[1],
+        totalDuration[0],
+        "HoursToDO",
+        "Temps à faire : "
+    );
 }
 
 // calcule le temps de travail effectué
@@ -207,6 +238,7 @@ function computedInputAndButton(
     div.style.display = "flex";
     div.style.alignItems = "center";
     div.style.marginTop = "1rem";
+    div.id = "divHoursToDO";
 
     const p = document.createElement("p");
     p.innerHTML = label;
