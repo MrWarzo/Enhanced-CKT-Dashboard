@@ -116,7 +116,7 @@ function getRecapWeek(timer) {
     })
         .catch(() => {
             // Si le recapWeek plante (session expirée) on stop tout et on relance le main
-            clearInterval(timer);
+            if (timer) clearInterval(timer);
             main();
         })
         .then((response) => response.json());
@@ -149,21 +149,39 @@ async function main() {
     await login(csrfToken); // Le login recup le cookie PHP_SESSIONID
     await displayInfos();
 
-    let timer = setInterval(async () => {
-        await displayInfos(timer);
+    const isRefreshing = false;
+
+    let timer = setInterval(() => {
+        if (isRefreshing) return;
+        isRefreshing = true;
+        displayInfos(timer).finally(() => {
+            isRefreshing = false;
+            console.log("Refreshed at : " + new Date().toLocaleTimeString());
+        });
     }, REFRESH_INTERVAL);
 
     // On relance l'intervale si on revient sur la page
     window.addEventListener("focus", () => {
+        console.log("Restarted at : " + new Date().toLocaleTimeString());
         clearInterval(timer);
-        timer = setInterval(async () => {
-            await displayInfos(timer);
+        displayInfos();
+        timer = setInterval(() => {
+            if (isRefreshing) return;
+            isRefreshing = true;
+            displayInfos(timer).finally(() => {
+                isRefreshing = false;
+                console.log(
+                    "Refreshed at : " + new Date().toLocaleTimeString()
+                );
+            });
+            // TODO : Ajouter un logger propre pour savoir quand ca refresh
         }, REFRESH_INTERVAL);
     });
 
     // On stoppe l'intervale si on quitte la page
     window.addEventListener("blur", () => {
         clearInterval(timer);
+        console.log("Stopped at : " + new Date().toLocaleTimeString());
     });
 }
 
@@ -212,6 +230,8 @@ async function displayInfos(timer) {
         "HoursToDO",
         "Temps à faire : "
     );
+
+    return new Promise((resolve) => resolve());
 }
 
 // calcule le temps de travail effectué
