@@ -149,7 +149,7 @@ async function main() {
     await login(csrfToken); // Le login recup le cookie PHP_SESSIONID
     await displayInfos();
 
-    const isRefreshing = false;
+    let isRefreshing = false;
 
     let timer = setInterval(() => {
         if (isRefreshing) return;
