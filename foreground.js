@@ -333,6 +333,28 @@ function handleCopyClick(HoursToDO, newTotalTimestamp, newTotalTime) {
 
     const textToCopy = `Temps de travail effectué : ${newTotalTime} \nReste à faire : ${timeToBeDoneValue} ${smiley}`;
     navigator.clipboard.writeText(textToCopy);
+
+    /** Envois sur webhook discord (fais à la zbeul, a revoir au grand nettoyage) */
+
+    // const aMe = document.querySelector('a[href="/user/me"]');
+    const divMe = document.querySelector('div[class="user-section"]');
+    const firstName = divMe.getElementsByTagName("div")[0]?.innerText;
+    if (!firstName) return;
+
+    const textToSend = `${firstName} a effectué : ${newTotalTime} \nIl lui reste à faire : ${timeToBeDoneValue} ${smiley}`;
+
+    fetch(
+        "https://discord.com/api/webhooks/1248539810352599115/PoX0mg_UDl2I3-x21kwDIdXGi_7fKXsv2R-m7VRX1Ug-rQYTNkp8P7q7Mv7nHIaDgIm8",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                content: textToSend,
+            }),
+        }
+    );
 }
 
 // Formate le temps en heures et minutes
