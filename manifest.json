@@ -14,14 +14,20 @@
         "default_popup": "popup/login.html"
     },
     "permissions": ["activeTab", "tabs", "webRequest", "storage"],
-    "host_permissions": ["https://super.dashboard.c-koya.tech/*"],
+    "host_permissions": [
+        "https://super.dashboard.c-koya.tech/*",
+        "https://dashboard.c-koya.tech/*"
+    ],
     "background": {
         "service_worker": "service-worker.js"
     },
     "content_scripts": [
         {
             "js": ["foreground.js"],
-            "matches": ["https://super.dashboard.c-koya.tech/*"]
+            "matches": [
+                "https://super.dashboard.c-koya.tech/*",
+                "https://dashboard.c-koya.tech/*"
+            ]
         }
     ]
 }

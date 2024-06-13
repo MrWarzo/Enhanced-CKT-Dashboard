@@ -1,6 +1,7 @@
 window.addEventListener("load", () => main());
 
-const DASHBOARD_URL = "https://super.dashboard.c-koya.tech";
+const { protocol, hostname, href } = window.location;
+const DASHBOARD_URL = `${protocol}//${hostname}`;
 const REFRESH_INTERVAL = 60000;
 const BUTTON_BASE_STYLE = `
     padding: 0px 1.125rem;
@@ -146,6 +147,7 @@ async function writeSyncStorage(key, value) {
 // TODO: utiliser les routes api dev à l'occasion
 async function main() {
     const csrfToken = await getCsrfTOken(); // Le token CSRF est necessaire pour le login
+    // TODO : vérifier si on a déjà un cookie valide, réduire le nombre de fetch
     await login(csrfToken); // Le login recup le cookie PHP_SESSIONID
     await displayInfos();
 
@@ -186,13 +188,19 @@ async function main() {
 }
 
 async function displayInfos(timer) {
+    if (
+        href !== DASHBOARD_URL + "/" &&
+        href !== DASHBOARD_URL + "/customPage/6"
+    )
+        return new Promise((resolve) => resolve());
+
     const recapWeek = await getRecapWeek(timer); // Recupere les pointages de la semaine
     const totalDuration = getTotalDuration(recapWeek); // Calcule la durée totale de travail
 
     const trueTotalPNode = document.createElement("p");
     const pNode = document.getElementsByClassName("mantine-Paper-root")[0];
 
-    // On supprime les anciennes divs pour les remplacer par les nouvelles updatées
+    // TODO : Il faut tous les supprimer car des fois on en a 2 l'espace d'une miliseconde et ça n'en supprime qu'un seul (GetElementsByClassName au lieu des id)
     const oldTrueTotalPNode = document.getElementById("trueTotalPNode");
     oldTrueTotalPNode?.remove();
 
@@ -336,7 +344,6 @@ function handleCopyClick(HoursToDO, newTotalTimestamp, newTotalTime) {
 
     /** Envois sur webhook discord (fais à la zbeul, a revoir au grand nettoyage) */
 
-    // const aMe = document.querySelector('a[href="/user/me"]');
     const divMe = document.querySelector('div[class="user-section"]');
     const firstName = divMe.getElementsByTagName("div")[0]?.innerText;
     if (!firstName) return;
