@@ -197,10 +197,7 @@ async function displayInfos(timer) {
     const recapWeek = await getRecapWeek(timer); // Recupere les pointages de la semaine
     const totalDuration = getTotalDuration(recapWeek); // Calcule la durée totale de travail
 
-    const trueTotalPNode = document.createElement("p");
-    const pNode = document.getElementsByClassName("mantine-Paper-root")[0];
-
-    // TODO : Il faut tous les supprimer car des fois on en a 2 l'espace d'une miliseconde et ça n'en supprime qu'un seul (GetElementsByClassName au lieu des id)
+    /** Remove des anciennes nodes */
     const oldTrueTotalPNode = document.getElementById("trueTotalPNode");
     oldTrueTotalPNode?.remove();
 
@@ -209,6 +206,13 @@ async function displayInfos(timer) {
 
     const oldDiv = document.getElementById("divHoursToDO");
     oldDiv?.remove();
+    /** ------------------------- */
+
+    const trueTotalPNode = document.createElement("p", {
+        id: "trueTotalPNode",
+    });
+
+    const pNode = document.getElementsByClassName("mantine-Paper-root")[0];
 
     let HoursToDO = 35;
     await readSyncStorage("HoursToDO")
@@ -220,11 +224,11 @@ async function displayInfos(timer) {
         });
 
     const timeToBeDone = HoursToDO * 60 * 60 * 1000 - totalDuration[1];
-    const pTimeToBeDone = document.createElement("p");
-    pTimeToBeDone.innerHTML = `<div id="pTimeToBeDone"><span style="font-weight:700">Temps restant : </span>${formattedTime(
+    const pTimeToBeDone = document.createElement("p", { id: "pTimeToBeDone" });
+    pTimeToBeDone.innerHTML = `<div><span style="font-weight:700">Temps restant : </span>${formattedTime(
         timeToBeDone
     )}</div>`;
-    trueTotalPNode.innerHTML = `<div id="trueTotalPNode"><span id="trueTotalPNode" style="font-weight:700">Total : </span>${totalDuration[0]}</div>`;
+    trueTotalPNode.innerHTML = `<div><span style="font-weight:700">Total : </span>${totalDuration[0]}</div>`;
 
     // TODO: Il faut aussi qu'on l'affiche direct dans le popup de l'extension pour ne plus dependre de la page
     pNode.appendChild(trueTotalPNode);
