@@ -208,9 +208,8 @@ async function displayInfos(timer) {
     oldDiv?.remove();
     /** ------------------------- */
 
-    const trueTotalPNode = document.createElement("p", {
-        id: "trueTotalPNode",
-    });
+    const trueTotalPNode = document.createElement("p");
+    trueTotalPNode.setAttribute("id", "trueTotalPNode");
 
     const pNode = document.getElementsByClassName("mantine-Paper-root")[0];
 
@@ -224,7 +223,8 @@ async function displayInfos(timer) {
         });
 
     const timeToBeDone = HoursToDO * 60 * 60 * 1000 - totalDuration[1];
-    const pTimeToBeDone = document.createElement("p", { id: "pTimeToBeDone" });
+    const pTimeToBeDone = document.createElement("p");
+    pTimeToBeDone.setAttribute("id", "pTimeToBeDone");
     pTimeToBeDone.innerHTML = `<div><span style="font-weight:700">Temps restant : </span>${formattedTime(
         timeToBeDone
     )}</div>`;
